@@ -1,0 +1,24 @@
+﻿@{
+    var cultures = new[] { "bg-BG", "en-US" };
+    var current = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
+}
+
+<form asp-controller="Culture" asp-action="Set" method="post">
+    <select name="culture"
+            class="form-select form-select-sm"
+            style="width:auto; display:inline-block"
+            onchange="this.form.submit()">
+
+        @foreach (var c in cultures)
+        {
+            <option value="@c" selected="@(current == c)">
+                @c
+            </option>
+        }
+
+    </select>
+
+    <input type="hidden"
+           name="returnUrl"
+           value="@Context.Request.Path@Context.Request.QueryString" />
+</form>

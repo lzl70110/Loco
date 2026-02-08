@@ -1,6 +1,13 @@
 ﻿using Loco.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Loco.Localization.Configuration;
+
+// + localization usings
+using Loco.Localization;
+using Loco.Localization.Resources;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 
 namespace Loco
     {
@@ -10,7 +17,6 @@ namespace Loco
             {
             var builder = WebApplication.CreateBuilder(args);
 
-            // 1) DbContext към DevConnection
             var connectionString = builder.Configuration.GetConnectionString("DevConnection")
                 ?? throw new InvalidOperationException("Connection string 'DevConnection' not found.");
 
@@ -19,23 +25,32 @@ namespace Loco
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            // 2) Identity
             builder.Services
                 .AddDefaultIdentity<IdentityUser>(options =>
                 {
-                    // За локална разработка - по-бързо без потвърждение на акаунт
                     options.SignIn.RequireConfirmedAccount = false;
                 })
-                // .AddRoles<IdentityRole>() // ако ще ползваме роли
+                // .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            // 3) MVC + Razor Pages (за Identity UI)
-            builder.Services.AddControllersWithViews();
+            // MVC + Razor Pages
+            builder.Services
+                .AddControllersWithViews()
+                .AddViewLocalization()
+                .AddDataAnnotationsLocalization(options =>
+                {
+                    // Route DataAnnotations to SharedResource
+                    options.DataAnnotationLocalizerProvider = (_, factory) =>
+                        factory.Create(typeof(SharedResource));
+                });
+
+            // register localization layer (ILocalizer + IStringLocalizer<SharedResource>)
+            builder.Services.AddAppLocalization();
+
             builder.Services.AddRazorPages();
 
             var app = builder.Build();
 
-            // 4) Pipeline
             if (app.Environment.IsDevelopment())
                 {
                 app.UseMigrationsEndPoint();
@@ -43,24 +58,39 @@ namespace Loco
             else
                 {
                 app.UseExceptionHandler("/Home/Error");
-                app.UseHsts(); // 30 дни по подразбиране
+                app.UseHsts();
                 }
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
- 
+
+            // request localization middleware
+            var supported = new[] { "bg-BG", "en-US" }
+                .Select(c => new CultureInfo(c)).ToList();
+
+            app.UseRequestLocalization(new RequestLocalizationOptions
+                {
+                DefaultRequestCulture = new RequestCulture("bg-BG"),
+                SupportedCultures = supported,
+                SupportedUICultures = supported,
+                RequestCultureProviders = new IRequestCultureProvider[]
+                {
+                    new CookieRequestCultureProvider(),
+                    new QueryStringRequestCultureProvider(),
+                    new AcceptLanguageHeaderRequestCultureProvider()
+                }
+                });
+
             app.UseAuthentication();
             app.UseAuthorization();
 
-            // 5) Endpoints
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
-            app.MapRazorPages(); // Identity UI
-
+            app.MapRazorPages();
             app.Run();
             }
         }

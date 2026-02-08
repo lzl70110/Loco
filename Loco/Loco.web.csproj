@@ -15,4 +15,10 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.23" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GCommon\Loco.GCommon.csproj" />
+    <ProjectReference Include="..\Loco.Application\Loco.Application.csproj" />
+    <ProjectReference Include="..\Loco.Localization\Loco.Localization.csproj" />
+  </ItemGroup>
+
 </Project>
