@@ -18,7 +18,12 @@
   <ItemGroup>
     <ProjectReference Include="..\GCommon\Loco.GCommon.csproj" />
     <ProjectReference Include="..\Loco.Application\Loco.Application.csproj" />
+    <ProjectReference Include="..\Loco.Infrastructure\Loco.Infrastructure.csproj" />
     <ProjectReference Include="..\Loco.Localization\Loco.Localization.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Migrations\" />
   </ItemGroup>
 
 </Project>

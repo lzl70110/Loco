@@ -117,10 +117,47 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Admin" xml:space="preserve">
+    <value>Admin</value>
+  </data>
+  <data name="AppTitle" xml:space="preserve">
+    <value>Locomotives</value>
+  </data>
+  <data name="App_Title" xml:space="preserve">
+    <value>Locomotives</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Hello" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
   <data name="Home_Title" xml:space="preserve">
     <value>Home Page</value>
   </data>
   <data name="Home_Welcome" xml:space="preserve">
     <value>Welcome</value>
+  </data>
+  <data name="Locomotives" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Login" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Logout" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Manage" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="Menu_Home" xml:space="preserve">
+    <value>Begin</value>
+  </data>
+  <data name="Register" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="WorkEntries" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
   </data>
 </root>

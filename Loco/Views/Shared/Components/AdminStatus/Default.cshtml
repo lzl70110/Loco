@@ -1,0 +1,10 @@
+﻿@model bool
+@inject Microsoft.Extensions.Localization.IStringLocalizer<Loco.Localization.Resources.SharedResource> SharedLocalizer
+
+<span class="fw-semibold @(Model ? "text-success" : "text-light")">
+    @SharedLocalizer["Admin"]
+</span>
+
+<span class="fw-semibold @(Model ? "text-success" : "text-light")">
+    @SharedLocalizer["Admin"]
+</span>

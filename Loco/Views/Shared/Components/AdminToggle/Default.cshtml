@@ -1,0 +1,39 @@
+﻿@model bool
+@inject Microsoft.Extensions.Localization.IStringLocalizer<Loco.Localization.Resources.SharedResource> SharedLocalizer
+
+@{
+    // Return to the same URL after toggling
+    var current = Context.Request.Path + Context.Request.QueryString;
+    }
+
+@if (User?.Identity?.IsAuthenticated == true)
+    {
+    <div class="d-flex align-items-center">
+        <!-- Admin ON -->
+        <form method="post"
+              asp-controller="Dev"
+              asp-action="Toggle"
+              class="me-2">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="isAdmin" value="1" />
+            <input type="hidden" name="returnUrl" value="@current" />
+            <button type="submit"
+                    class="btn btn-sm @(Model ? "btn-outline-success" : "btn-success")">
+                @SharedLocalizer["Admin"] ON
+            </button>
+        </form>
+
+        <!-- Admin OFF -->
+        <form method="post"
+              asp-controller="Dev"
+              asp-action="Toggle">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="isAdmin" value="0" />
+            <input type="hidden" name="returnUrl" value="@current" />
+            <button type="submit"
+                    class="btn btn-sm @(Model ? "btn-danger" : "btn-outline-secondary")">
+                @SharedLocalizer["Admin"] OFF
+            </button>
+        </form>
+    </div>
+    }

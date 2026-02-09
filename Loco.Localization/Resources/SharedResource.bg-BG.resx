@@ -117,10 +117,46 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Admin" xml:space="preserve">
+    <value>Администратор</value>
+  </data>
+  <data name="AppTitle" xml:space="preserve">
+    <value>Локо</value>
+  </data>
+  <data name="App_Title" xml:space="preserve">
+    <value>Локомотиви</value>
+  </data>
+  <data name="Hello" xml:space="preserve">
+    <value>Здравей</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Начало</value>
+  </data>
   <data name="Home_Title" xml:space="preserve">
     <value>Начална страница</value>
   </data>
   <data name="Home_Welcome" xml:space="preserve">
     <value>Добре дошли</value>
+  </data>
+  <data name="Locomotives" xml:space="preserve">
+    <value>Локомотиви</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Вход</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Изход</value>
+  </data>
+  <data name="Manage" xml:space="preserve">
+    <value>Профил</value>
+  </data>
+  <data name="Menu_Home" xml:space="preserve">
+    <value>Начало</value>
+  </data>
+  <data name="Register" xml:space="preserve">
+    <value>Регистрация</value>
+  </data>
+  <data name="WorkEntries" xml:space="preserve">
+    <value>Работни записи</value>
   </data>
 </root>

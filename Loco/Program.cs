@@ -1,13 +1,13 @@
-﻿using Loco.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Loco.Localization.Configuration;
-
-// + localization usings
-using Loco.Localization;
-using Loco.Localization.Resources;
-using Microsoft.AspNetCore.Localization;
+﻿
 using System.Globalization;
+using Loco.Infrastructure.Persistence;
+using Loco.Localization.Configuration;
+using Loco.Localization.Resources;
+using Loco.Web.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Loco
     {
@@ -20,7 +20,7 @@ namespace Loco
             var connectionString = builder.Configuration.GetConnectionString("DevConnection")
                 ?? throw new InvalidOperationException("Connection string 'DevConnection' not found.");
 
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            builder.Services.AddDbContext<LocoDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -31,7 +31,7 @@ namespace Loco
                     options.SignIn.RequireConfirmedAccount = false;
                 })
                 // .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<LocoDbContext>();
 
             // MVC + Razor Pages
             builder.Services
@@ -48,7 +48,7 @@ namespace Loco
             builder.Services.AddAppLocalization();
 
             builder.Services.AddRazorPages();
-
+            builder.Services.AddSingleton<IAdminStateService, AdminStateService>();
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
@@ -60,6 +60,8 @@ namespace Loco
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
                 }
+
+             
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

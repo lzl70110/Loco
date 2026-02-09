@@ -1,90 +1,184 @@
-﻿@using Loco.Localization.Adapters
-@inject ILocalizer L
+﻿@using Loco.Localization.Resources
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Localization
+@using System.Security.Claims
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> SharedLocalizer
+
+@{
+    // Current UI culture (e.g., "bg-BG" or "en-US")
+    var rqf = Context.Features.Get<IRequestCultureFeature>();
+    var culture = rqf?.RequestCulture.UICulture.Name ?? "bg-BG";
+
+    // Target after logout (preserve culture)
+    var returnUrl = Url.Action("Index", "Home", new { area = "", culture = culture, ui_culture = culture });
+
+    // Localized application title (e.g., „Локо“)
+    var appTitle = SharedLocalizer["AppTitle"];
+
+    // Admin flag (claims-based): IsAdmin=true
+    var isAdminClaim = User?.Claims?.FirstOrDefault(c => c.Type == "IsAdmin")?.Value;
+    bool isAdmin = string.Equals(isAdminClaim, "true", StringComparison.OrdinalIgnoreCase);
+    }
 
 <!DOCTYPE html>
-<html lang="@System.Threading.Thread.CurrentThread.CurrentUICulture.Name">
+<html lang="@culture">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@L["App_Title"] - @ViewData["Title"]</title>
+    <title>@appTitle - @ViewData["Title"]</title>
 
+    <!-- Styles: bootstrap + site -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Loco.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/Loco.styles.css" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">@L["App_Title"]</a>
+        <!-- Top navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom box-shadow mb-3">
+            <div class="container">
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <!-- Brand (go Home and keep culture) -->
+                <a class="navbar-brand"
+                   asp-controller="Home" asp-action="Index"
+                   asp-route-culture="@culture" asp-route-ui_culture="@culture">
+                    @appTitle
+                </a>
+
+                <!-- Mobile toggler -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                        aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <!-- Collapsible content -->
+                <div class="collapse navbar-collapse" id="mainNav">
+
+                    <!-- Left menu -->
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <!-- Home -->
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">@L["Menu_Home"]</a>
+                            <a class="nav-link"
+                               asp-controller="Home" asp-action="Index"
+                               asp-route-culture="@culture" asp-route-ui_culture="@culture">
+                                @SharedLocalizer["Home"]
+                            </a>
+                        </li>
+
+                        <!-- Locomotives -->
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="Locomotives" asp-action="Index"
+                               asp-route-culture="@culture" asp-route-ui_culture="@culture">
+                                @SharedLocalizer["Locomotives"]
+                            </a>
+                        </li>
+
+                        <!-- Work Entries -->
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="WorkEntries" asp-action="Index"
+                               asp-route-culture="@culture" asp-route-ui_culture="@culture">
+                                @SharedLocalizer["WorkEntries"]
+                            </a>
                         </li>
                     </ul>
 
-                    <!-- Right side: language switcher + IsAdmin + ADMIN badge + Login/Register -->
-                    <div class="d-flex align-items-center">
-                        @await Html.PartialAsync("_LanguageSwitcher")
+                    <!-- Right: language switch + admin label + identity -->
+                    <ul class="navbar-nav ms-auto">
+                        <!-- Language switcher -->
+                        <li class="nav-item d-flex align-items-center me-2">
+                            <partial name="_LanguageSwitcher" />
+                        </li>
 
-                        @{
-                            var isAdmin = Context.Request.Cookies.TryGetValue("Dev-IsAdmin", out var v) && v == "1";
-                            }
+                        <!-- Admin label: green if admin, otherwise light -->
+                        <li class="nav-item d-flex align-items-center me-2">
+                            <span class="fw-semibold @(isAdmin ? "text-success" : "text-light")">
+                                @SharedLocalizer["Admin"]
+                            </span>
+                        </li>
 
-                        <form asp-controller="Dev" asp-action="Toggle" method="post" class="ms-3" style="margin-right:1cm">
-                            @Html.AntiForgeryToken()
-
-                            <div class="form-check">
-                                <input class="form-check-input"
-                                       type="checkbox"
-                                       id="devIsAdminToggle"
-                                       name="isAdmin"
-                                       value="true"
-                                       @(isAdmin ? "checked" : null)
-                                       onchange="this.form.submit()" />
-                                <label class="form-check-label" for="devIsAdminToggle">IsAdmin</label>
-                            </div>
-
-                            <!-- The hidden false must come after the checkbox -->
-                            <input type="hidden" name="isAdmin" value="false" />
-                            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
-                        </form>
-
-                        @if (isAdmin)
+                        @* Identity block *@
+                        @if (SignInManager.IsSignedIn(User))
                             {
-                            <span class="badge text-bg-warning ms-2">ADMIN</span>
-                            @* For localized badge, add Dev_AdminBadge key and use: @L["Dev_AdminBadge"] *@
-                            }
+                            <!-- Manage (Hello, username) -->
+                            <li class="nav-item">
+                                <a class="nav-link text-light"
+                                   asp-area="Identity"
+                                   asp-page="/Account/Manage/Index"
+                                   asp-route-culture="@culture"
+                                   asp-route-ui_culture="@culture"
+                                   title="@SharedLocalizer["Manage"]">
+                                    @SharedLocalizer["Hello"] @User.Identity?.Name!
+                                </a>
+                            </li>
 
-                        <partial name="_LoginPartial" />
-                    </div>
+                            <!-- Logout (POST) -->
+                            <li class="nav-item">
+                                <form class="form-inline"
+                                      method="post"
+                                      asp-area="Identity"
+                                      asp-page="/Account/Logout"
+                                      asp-route-returnUrl="@returnUrl"
+                                      asp-route-culture="@culture"
+                                      asp-route-ui_culture="@culture">
+                                    <button type="submit" class="nav-link btn btn-link text-light">
+                                        @SharedLocalizer["Logout"]
+                                    </button>
+                                </form>
+                            </li>
+                            }
+                        else
+                            {
+                            <!-- Register -->
+                            <li class="nav-item">
+                                <a class="nav-link text-light"
+                                   asp-area="Identity"
+                                   asp-page="/Account/Register"
+                                   asp-route-culture="@culture"
+                                   asp-route-ui_culture="@culture">
+                                    @SharedLocalizer["Register"]
+                                </a>
+                            </li>
+
+                            <!-- Login -->
+                            <li class="nav-item">
+                                <a class="nav-link text-light"
+                                   asp-area="Identity"
+                                   asp-page="/Account/Login"
+                                   asp-route-culture="@culture"
+                                   asp-route-ui_culture="@culture">
+                                    @SharedLocalizer["Login"]
+                                </a>
+                            </li>
+                            }
+                    </ul>
                 </div>
             </div>
         </nav>
     </header>
 
+    <!-- Main content -->
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
+    <!-- Footer -->
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; @DateTime.Now.Year - @L["App_Title"]
+            <span class="me-2">&copy; @DateTime.Now.Year - @appTitle</span>
         </div>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <!-- Scripts: bootstrap bundle + site -->
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/js/site.js"></script>
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>
